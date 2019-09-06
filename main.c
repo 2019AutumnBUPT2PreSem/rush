@@ -165,7 +165,7 @@ int main()
 				{
 					system("cls");
 					int provider=admin.clm.phint[IDa][2];
-					quit_menu=admchoose(telerecord, netrecord,moneyrecord,&sets,&user,provider,IDa);
+					quit_menu=admchoose(&telerecord, &netrecord,&moneyrecord,&sets,&user,provider,IDa);
 					system("cls");
 				}
 			}
