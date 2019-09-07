@@ -6,29 +6,24 @@
 #include"displaysupport.c"
 #include<string.h>
 
-extern int indent;
-extern char diagL[80];
-
 tblclmh giveBlankClmh(void);
 tblinfo giveBlankInfo(void);
 tbl giveBlankTbl(void);
 tim giveBlankTim(void);
 
 char* fillnam(const char *p);  // support the function fill name
-char* fillfilenam(const char *p); // don'tuse
-void setInfo(tblinfo *pinfo, char* name, int intNum, int strNum, int timNum, int rowNum); //set info
+void setInfo(tblinfo *pinfo, int intNum, int strNum, int timNum, int rowNum); //set info
 int getClmNum(tblinfo info); // get the number of each column
 
 int myxor(int a, int b);
 
-tblclmh assignTblclmh(tblinfo info); // create space for column head
-void resignTblclmh(tblclmh tablecolumn); // free space for column head
+int** assignChart_int(int rowNum);
+char*** assignChart_nam(int rowNum);
+tim** assignChart_tim(int rowNum);
 
-tblclmh assignTblChart(tblinfo info); //create space for chart
-void resignTblChart(tblclmh tablecolumn, tblinfo info); //free space for chart
-
-void cpyTblclmh(tblinfo info, tblclmh clmh1, tblclmh clmh2); //clmh1->clmh2
-void extendTblclm(tblinfo info, tblclmh *tablecolumn, int *locRowNum); //this chart will change ptablecolumn to NULL if failed
+void resignChart_int(int **ppint, int rowNum);
+void resignChart_nam(char ***pppchar, int rowNum);
+void resignChart_tim(tim **pptim, int rowNum);
 
 void addrow(tbl *table, int *introw, char **namrow, tim *timrow); // add a new row to chart
 
@@ -44,7 +39,6 @@ tblclmh giveBlankClmh(void)
 tblinfo giveBlankInfo(void)
 {
     tblinfo info;
-    info.name = NULL;
     info.intNum = 0;
     info.namNum = 0;
     info.timNum = 0;
@@ -57,7 +51,6 @@ tbl giveBlankTbl(void)
 {
     tbl table;
     table.info = giveBlankInfo();
-    table.pitem = NULL;
     table.lrn = 0;
     table.clm = giveBlankClmh(); 
     return table;
@@ -86,18 +79,8 @@ char* fillnam(const char *p) //you need to free the pointer // support the funct
     }
     return newnam;
 }
-char* fillfilenam(const char *p) // must char * p = fillnam("dfakwfjdshfalkjdf"); char * q = fillfilenam(p); free(p); ... free(q);
+void setInfo(tblinfo *pinfo, int intNum, int namNum, int timNum, int rowNum) // set infoo
 {
-    char* newnam = (char*)malloc(sizeof(char) * (STRLENLIMIT + 5));
-    strncpy(newnam, p, STRLENLIMIT);
-    newnam[STRLENLIMIT] = '\0';
-    strcat(newnam, ".tbl");
-    return newnam;
-}
-void setInfo(tblinfo *pinfo, char *name, 
-              int intNum, int namNum, int timNum, int rowNum) // set infoo
-{
-    pinfo->name = name;
     pinfo->intNum = intNum;
     pinfo->namNum = namNum;
     pinfo->timNum = timNum;
@@ -114,208 +97,156 @@ int myxor(int a, int b)
 	return (!a && b) || (a && !b);
 }
 
-tblclmh assignTblclmh(tblinfo info) // create space for column head
+int** assignChart_int(int rowNum)
 {
-    tblclmh newclmh;
+    int **ppi = constructD2_int(rowNum, 11, 0);
+    if(ppi == NULL)
+        printf("[NULL int]\n");
+    return ppi;
+}
+char*** assignChart_nam(int rowNum)
+{
+    char ***pppc;
+    pppc = constructD3_char(rowNum, 5, STRLENLIMIT,'\0');
+    if(pppc == NULL)
+        printf("[NULL nam]\n");
+    return pppc;
+}
 
-    sprintf(diagL, "[trying to assign row pointer]\n");
-    displayDiagnos();
+tim** assignChart_tim(int rowNum)
+{
+    tim **ppt;
+    ppt = constructD2_tim(rowNum, 2, giveBlankTim());
+    if(ppt == NULL)
+        printf("[NULL tim]\n");
+    return ppt;
+}
 
-    indent++;
-    newclmh.phint = constructD1_intp(info.intNum, NULL);
-    if(myxor(newclmh.phint == NULL, info.intNum <= 0))
+void resignChart_int(int **ppi, int rowNum)
+{
+    destroyD2_int(ppi, rowNum);
+}
+void resignChart_nam(char ***pppc, int rowNum)
+{
+    destroyD3_char(pppc, rowNum, 2);
+}
+void resignChart_tim(tim **ppt, int rowNum)
+{
+    destroyD2_tim(ppt, rowNum);
+}
+tblinfo readidat(FILE *pfile, tblclmh *pclm, int lrn)
+{
+    tblinfo info;
+    fread(&info.rowNum, sizeof(int), 1, pfile);
+    fread(&info.intNum, sizeof(int), 1, pfile);
+    fread(&info.namNum, sizeof(int), 1, pfile);
+    fread(&info.timNum, sizeof(int), 1, pfile);
+    pclm->phint = assignChart_int(lrn);
+    pclm->phtim = assignChart_tim(lrn);
+    for(int i = 0; i < info.rowNum; i++)
     {
-        sprintf(diagL, "[assign block pointer for int failed, row pointer set NULL]\n");
-        displayDiagnos();
-        newclmh = giveBlankClmh();
-    }
-    else
-    {
-        sprintf(diagL, "[assign block pointer for int done, assign that for nam]\n");
-        displayDiagnos();
-
-        newclmh.phnam = constructD1_charpp(info.namNum, NULL);
-        if(myxor(newclmh.phnam == NULL, info.namNum <= 0))
+        fread(pclm->phint[i], sizeof(int), info.intNum, pfile);
+        for(int j = 0; j < info.timNum; j++)
         {
-            sprintf(diagL, "[assign block pointer for nam failed, row pointer set NULL]\n");
-            displayDiagnos();
+            fread(&pclm->phtim[i][j].yea, sizeof(int), 1, pfile);
+            fread(&pclm->phtim[i][j].mon, sizeof(int), 1, pfile);
+            fread(&pclm->phtim[i][j].day, sizeof(int), 1, pfile);
+            fread(&pclm->phtim[i][j].hou, sizeof(int), 1, pfile);
+            fread(&pclm->phtim[i][j].min, sizeof(int), 1, pfile);
+            fread(&pclm->phtim[i][j].sec, sizeof(int), 1, pfile);  
+        } 
+    }
+    return info;
+}
 
-            destroyD1_intp(newclmh.phint);
-            newclmh = giveBlankClmh();
-        }
-        else
+void readcdat(FILE *pfile, tblinfo info, tblclmh *pclm, int lrn)
+{
+    pclm->phnam = assignChart_nam(lrn);
+    for(int i = 0; i < info.rowNum; i++)
+    {
+        for(int j = 0; j < info.namNum; j++)
         {
-            sprintf(diagL, "[assign block pointer for nam done, set that for tim]\n");
-            displayDiagnos();
-
-            newclmh.phtim = constructD1_timp(info.timNum, NULL);
-            if(myxor(newclmh.phtim == NULL, info.timNum <= 0))
-            {
-                sprintf(diagL, "[assign block pointer for tim failed, row pointer set NULL]\n");
-                displayDiagnos();
-
-                destroyD1_intp(newclmh.phint);
-                destroyD1_charpp(newclmh.phnam);
-                newclmh = giveBlankClmh();
-            }
-            else
-            {
-                sprintf(diagL, "[assign block pointer for tim done]\n");
-                displayDiagnos();
-            }
+            fread(pclm->phnam[i][j], sizeof(char), STRLENLIMIT, pfile);
         }
     }
-    indent--;
-
-    sprintf(diagL, "[assign row pointer procedure done]\n");
-    displayDiagnos();
-
-    return newclmh;
-}
-void resignTblclmh(tblclmh tablecolumn) // free space for column head
-{
-    sprintf(diagL, "[resigning row pointer]\n");
-    displayDiagnos();
-
-	destroyD1_intp(tablecolumn.phint);
-    destroyD1_charpp(tablecolumn.phnam);
-    destroyD1_timp(tablecolumn.phtim);
-
-    sprintf(diagL, "[resign row pointer done]\n");
-    displayDiagnos();
 }
 
-void cpyTblclmh(tblinfo info, tblclmh clmh1, tblclmh clmh2) // clmh1 -> clmh2
+void writeidat(FILE *pfile, tblinfo info, tblclmh *pclm, int lrn)
 {
-    sprintf(diagL, "[copying row pointer  of %s to new row pointer]\n", info.name);
-    displayDiagnos();
-
-    for(int i = 0; i < info.intNum; i++)
+    fwrite(&info.rowNum, sizeof(int), 1, pfile);
+    fwrite(&info.intNum, sizeof(int), 1, pfile);
+    fwrite(&info.namNum, sizeof(int), 1, pfile);
+    fwrite(&info.timNum, sizeof(int), 1, pfile);
+    for(int i = 0; i < info.rowNum; i++)
     {
-        clmh2.phint[i] = clmh1.phint[i];
-    }
-    for(int i = 0; i < info.namNum; i++)
-    {
-        clmh2.phnam[i] = clmh1.phnam[i];
-    }
-    for(int i = 0; i < info.timNum; i++)
-    {
-        clmh2.phtim[i] = clmh1.phtim[i];
-    }
-
-    sprintf(diagL, "[copy row pointer done]\n");
-    displayDiagnos();
-}
-
-tblclmh assignTblChart(tblinfo info) //create space for chart
-{
-    tblclmh newclmh = giveBlankClmh();
-    newclmh.phint = constructD2_int(info.rowNum,info.intNum, 0);//
-    newclmh.phnam = constructD3_char(info.rowNum, info.namNum, STRLENLIMIT, '\0');   
-    newclmh.phtim = constructD2_tim(info.rowNum,info.timNum,giveBlankTim());
-    return newclmh;
-}
-
-void resignTblChart(tblclmh tablecolumn, tblinfo info) //free space for chart
-{
-	destroyD2_int(tablecolumn.phint, info.intNum);
-    destroyD3_char(tablecolumn.phnam, info.namNum, info.rowNum);
-    destroyD2_tim(tablecolumn.phtim, info.timNum);
-}
-
-void extendTblclm(tblinfo info, tblclmh *tablecolumn, int *locRowNum)
-{
-	tblinfo tempinfo = info;
-	tblclmh tempclm;
-	tempinfo.rowNum += EXPPT; 
-	tempclm = assignTblChart(tempinfo);
-	for(int i = 0; i < info.rowNum; i++)
-	{
-		for(int j = 0; j < info.intNum; j++)
-		{
-			tempclm.phint[i][j] = tablecolumn->phint[i][j];
-		}
-		for(int j = 0; j < info.namNum; j++)
-		{
-			for(int k = 0; k < STRLENLIMIT; k++)
-			{
-				if(tablecolumn->phnam[i][j][k] != NULL)
-				{
-					tempclm.phnam[i][j][k] = tablecolumn->phnam[i][j][k];
-				}
-				else
-				{
-					printf("[IDIOTIDIOTIDIOTIDIOT]\n");
-				}
-		
-			}
-		}
-		for(int j = 0; j < info.timNum; j++)
-		{
-			tempclm.phtim[i][j] = tablecolumn->phtim[i][j];
-		}
-	}
-	*locRowNum = *locRowNum + EXPPT;
-	*tablecolumn = tempclm;
-}
-
-void addrow(tbl *ptable, int *introw, char **namrow, tim *timrow) // add a new blank row to chart
-{
-    if(ptable->lrn < (ptable->info.rowNum + 1))
-    {
-    	extendTblclm(ptable->info, &(ptable->clm), &ptable->lrn);
-    	addrow(ptable, introw, namrow, timrow);
-	}
-	else
-	{
-		
-		for(int i = 0; i < ptable->info.intNum; i++)
+        fwrite(pclm->phint[i], sizeof(int), info.intNum, pfile);
+        for(int j = 0; j < info.timNum; j++)
         {
-            ptable->clm.phint[ptable->info.rowNum][i] = introw[i];
-        }
-		printf("int done\n");
-        for(int i = 0; i < ptable->info.namNum; i++)
+            fwrite(&pclm->phtim[i][j].yea, sizeof(int), 1, pfile);
+            fwrite(&pclm->phtim[i][j].mon, sizeof(int), 1, pfile);
+            fwrite(&pclm->phtim[i][j].day, sizeof(int), 1, pfile);
+            fwrite(&pclm->phtim[i][j].hou, sizeof(int), 1, pfile);
+            fwrite(&pclm->phtim[i][j].min, sizeof(int), 1, pfile);
+            fwrite(&pclm->phtim[i][j].sec, sizeof(int), 1, pfile);  
+        } 
+    }
+    //resignChart_int(pclm->phint, lrn);
+    //resignChart_tim(pclm->phtim, lrn);
+}
+
+void writecdat(FILE *pfile, tblinfo info, tblclmh *pclm, int lrn)
+{
+    for(int i = 0; i < info.rowNum; i++)
+    {
+        for(int j = 0; j < info.namNum; j++)
         {
-        	if(namrow[i] != NULL)
-        	{
-        		strcpy(ptable->clm.phnam[ptable->info.rowNum][i], namrow[i]);
-			}
+            fwrite(pclm->phnam[i][j], sizeof(char), STRLENLIMIT, pfile);
         }
-		printf("nam done\n");
-        for(int i = 0; i < ptable->info.timNum; i++)
-        {
-            ptable->clm.phtim[ptable->info.rowNum][i] = timrow[i];
-        }
-		printf("time done\n");
-        ptable->info.rowNum = ptable->info.rowNum + 1;
-	}
+    }
+    //resignChart_nam(pclm->phnam, lrn);
+}
+
+void cpyrow(tbl *ptable, int *introw, char **namrow, tim *timrow)
+{
+	for(int i = 0; i < ptable->info.intNum; i++)
+    {
+        ptable->clm.phint[i][ptable->info.rowNum] = introw[i];
+    }
+
+    for(int i = 0; i < ptable->info.namNum; i++)
+    {
+        strncpy(ptable->clm.phnam[i][ptable->info.rowNum], namrow[i], STRLENLIMIT);
+    }
+    
+    for(int i = 0; i < ptable->info.timNum; i++)
+    {
+        ptable->clm.phtim[i][ptable->info.rowNum] = timrow[i];
+    }
+
+    ptable->info.rowNum = ptable->info.rowNum + 1;
 }
 
 void display_tbl(tbl table)
 {
-    displayInfo(table.info);
-    tblclmh temp = assignTblclmh(table.info);
-    cpyTblclmh(table.info, table.clm, temp);
-
+    int **ppint = table.clm.phint;
+    char ***ppnam = table.clm.phnam;
+    tim **pptim = table.clm.phtim;
     for(int i = 0; i < table.info.rowNum; i++)
     {
         for (int j = 0; j < table.info.intNum; j++)
         {
-            display_int(*temp.phint[j]);
+            display_int(ppint[i][j]);
             printf("|");
-            temp.phint[j]++;
         }
         for (int j = 0; j < table.info.namNum; j++)
         { 
-            display_nam(*temp.phnam[j]);
+            display_nam(ppnam[i][j]);
             printf("|");
-            temp.phnam[j]++;
         }
         for (int j = 0; j < table.info.timNum; j++)
         {
-            display_tim(*temp.phtim[j]);
+            display_tim(pptim[i][j]);
             printf("|");
-            temp.phtim[j]++;
         }
         printf("\n");    
     }

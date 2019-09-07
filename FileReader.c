@@ -1,6 +1,4 @@
 #include<stdio.h>
-#include"dbio.c"
-
 void FileReader(FILE *pfile,tbl *ptable)
 {
 	int int_num=ptable->info.intNum;

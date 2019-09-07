@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h> 
 #include"dbstruct.h"
-#include"dbio.c"
 #include"utilsupport.c"
 #define STRLENLIMIT 16
 
@@ -503,7 +502,8 @@ void addNewSet(tbl* sets,int provider)
 	char **nam=constructD2_char(1,STRLENLIMIT,'\0');
 	strcpy(nam[0],name);
 	tim *time=NULL;
-	addrow(sets,inte,nam,time);
+	cpyrow(sets,inte,nam,time);
+	
 }
 
 

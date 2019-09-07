@@ -4,9 +4,6 @@
 #define TBLINFONUM 8
 #define EXPPT 20// expand per tim
 
-int indent = 0;
-char diagL[80];
-
 typedef struct yymmddhhmmss
 {
     int yea;
@@ -20,7 +17,6 @@ typedef struct yymmddhhmmss
 
 typedef struct tableinfo
 {
-    char *name;
     int intNum;
     int namNum;
     int timNum;
@@ -39,7 +35,6 @@ typedef struct tablecolumn
 typedef struct table
 {
     tblinfo info;
-    char **pitem;
     int lrn; // located row number
     tblclmh clm;
 } tbl;

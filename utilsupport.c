@@ -4,15 +4,12 @@
 #include<stdio.h>
 #include"dbstruct.h"
 #include"dboperation.c"
-#include"dbio.c"
+//#include"dbio.c"
 
 #define DBMEMORY_C int
 #define MAX_CLIENT 30000
 #define IGNR_NUM 30001
 #define CompFunType int
-
-extern int indent;
-extern char diagL[80];
 
 void ReadArray(DBMEMORY_C (*database)[2],int row_num,DBMEMORY_C* tempArray);
 void genSeqL(int* array,int row);
@@ -107,7 +104,7 @@ int accum(int *p, int n,  int *acsmap)
     }
 	return acmres;
 }
-
+/*
 void setAllTable(tbl *pprovider, tbl *puser, tbl *pbillinfo, tbl *ptelerecord, tbl *pnetrecord, tbl *padmin, tbl *pset, tbl *pmoneyrecord)
 {
 	char *name,**iteml;
@@ -231,7 +228,8 @@ void setAllTable(tbl *pprovider, tbl *puser, tbl *pbillinfo, tbl *ptelerecord, t
 	name = NULL;
 	iteml = NULL;
 }
-
+*/
+/*
 int existFirstTime(tbl provider, tbl user, tbl billinfo, tbl telerecord, tbl netrecord, tbl admin, tbl set, tbl moneyrecord)
 {
 	return (isFirstTime(provider) || isFirstTime(set) || isFirstTime(user) || isFirstTime(billinfo) || 
@@ -273,6 +271,6 @@ void writeAllTable(tbl *pprovider, tbl *puser, tbl *pbillinfo, tbl *ptelerecord,
 	encloseTable(pset);
 	encloseTable(pmoneyrecord);
 }
-
+*/
 
 #endif
