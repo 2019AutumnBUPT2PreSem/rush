@@ -52,7 +52,7 @@ int main()
 	fclose(pfile);
 
 	////////////////////
-		netrecord.lrn = 30;
+	netrecord.lrn = 30;
 	pfile=fopen("netrecord.idat","rb");
 	netrecord.info= readidat(pfile,&netrecord.clm,netrecord.lrn);
 	fclose(pfile);
@@ -100,14 +100,7 @@ int main()
 	pfile=fopen("billinfo.cdat","rb");
 	readcdat(pfile,billinfo.info,&billinfo.clm,billinfo.lrn);
 	fclose(pfile);
-	display_tbl(provider);
-	display_tbl(admin);
-	display_tbl(telerecord);
-	display_tbl(netrecord);
-	display_tbl(sets);
-	display_tbl(user);
-	display_tbl(moneyrecord);
-	display_tbl(billinfo);
+	
 	//clearscree();
 	/*we gonna read all table there*/
 	int quit_prog=0;
@@ -161,7 +154,7 @@ int main()
 				{
 					clearscree();
 					int provider=admin.clm.phint[IDa][2];
-					quit_menu=admchoose(&telerecord, &netrecord,&moneyrecord,&sets,&user,provider,IDa);
+					quit_menu=admchoose(&admin,&telerecord, &netrecord,&moneyrecord,&sets,&user,provider,IDa);
 					clearscree();
 				}
 			}
