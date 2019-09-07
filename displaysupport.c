@@ -20,6 +20,6 @@ void display_nam(char* name)// display the name on screen
 }
 void display_tim(tim time)// display the time on screen
 {
-    printf("%02d/%02d/%02d%02d:%02d:%02d", time.yea, time.mon, time.day, time.hou, time.min, time.sec);
+    printf("%02d/%02d/%02d %02d:%02d:%02d", time.yea, time.mon, time.day, time.hou, time.min, time.sec);
 }
 #endif

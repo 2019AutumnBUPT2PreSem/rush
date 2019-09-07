@@ -9,6 +9,13 @@
 #include"service.c"
 #include"FileReader.c"
 #include"addition.c"
+
+void clearscree(void)
+{
+	int a;
+//	system("cls");
+}
+
 int main()
 {
 	/*get all table*/
@@ -93,8 +100,15 @@ int main()
 	pfile=fopen("billinfo.cdat","rb");
 	readcdat(pfile,billinfo.info,&billinfo.clm,billinfo.lrn);
 	fclose(pfile);
-	
-	system("cls");
+	display_tbl(provider);
+	display_tbl(admin);
+	display_tbl(telerecord);
+	display_tbl(netrecord);
+	display_tbl(sets);
+	display_tbl(user);
+	display_tbl(moneyrecord);
+	display_tbl(billinfo);
+	//clearscree();
 	/*we gonna read all table there*/
 	int quit_prog=0;
 	int quit_menu=0;
@@ -125,16 +139,16 @@ int main()
 			{
 				while(quit_menu==0)
 				{
-					system("cls");
+					clearscree();
 					quit_menu=userMainBody(provider,user,billinfo,telerecord,netrecord,admin,sets,moneyrecord,IDu);
-					system("cls");
+					clearscree();
 				}
 			}
 			else
 			{
 				printf("You aren't a user of this system, press enter to continue\n");
 				getchar();
-				system("cls");
+				clearscree();
 			}
 				
 		}
@@ -145,27 +159,27 @@ int main()
 			{
 				while(quit_menu==0)
 				{
-					system("cls");
+					clearscree();
 					int provider=admin.clm.phint[IDa][2];
 					quit_menu=admchoose(&telerecord, &netrecord,&moneyrecord,&sets,&user,provider,IDa);
-					system("cls");
+					clearscree();
 				}
 			}
 			else
 			{
 				printf("You aren't a admin of this system, press enter to continue\n");
 				getchar();
-				system("cls");
+				clearscree();
 			}
 		}
 		else if(type==0)
 		{
-			system("cls");
+			clearscree();
 			quit_prog=1;//quit the program
 		}
 		else
 		{	
-			system("cls");
+			clearscree();
 			printf("You have input a wrong num,please retry! press enter to continue\n\n");
 			getchar();
 		}

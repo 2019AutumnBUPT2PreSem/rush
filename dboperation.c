@@ -14,6 +14,7 @@ tim giveBlankTim(void);
 char* fillnam(const char *p);  // support the function fill name
 void setInfo(tblinfo *pinfo, int intNum, int strNum, int timNum, int rowNum); //set info
 int getClmNum(tblinfo info); // get the number of each column
+display_tblrow(tbl table, int ID);
 
 int myxor(int a, int b);
 
@@ -210,20 +211,46 @@ void cpyrow(tbl *ptable, int *introw, char **namrow, tim *timrow)
 {
 	for(int i = 0; i < ptable->info.intNum; i++)
     {
-        ptable->clm.phint[i][ptable->info.rowNum] = introw[i];
+
+        ptable->clm.phint[ptable->info.rowNum][i] = introw[i];
     }
 
     for(int i = 0; i < ptable->info.namNum; i++)
     {
-        strncpy(ptable->clm.phnam[i][ptable->info.rowNum], namrow[i], STRLENLIMIT);
+
+        strncpy(ptable->clm.phnam[ptable->info.rowNum][i], namrow[i], STRLENLIMIT);
     }
     
     for(int i = 0; i < ptable->info.timNum; i++)
     {
-        ptable->clm.phtim[i][ptable->info.rowNum] = timrow[i];
+        ptable->clm.phtim[ptable->info.rowNum][i] = timrow[i];
     }
 
     ptable->info.rowNum = ptable->info.rowNum + 1;
+}
+
+display_tblrow(tbl table, int ID)
+{
+	int i = ID;
+	int **ppint = table.clm.phint;
+    char ***ppnam = table.clm.phnam;
+    tim **pptim = table.clm.phtim;
+	for (int j = 0; j < table.info.intNum; j++)
+        {
+            display_int(ppint[i][j]);
+            printf("|");
+        }
+        for (int j = 0; j < table.info.namNum; j++)
+        { 
+            display_nam(ppnam[i][j]);
+            printf("|");
+        }
+        for (int j = 0; j < table.info.timNum; j++)
+        {
+            display_tim(pptim[i][j]);
+            printf("|");
+        }
+        printf("\n");    
 }
 
 void display_tbl(tbl table)

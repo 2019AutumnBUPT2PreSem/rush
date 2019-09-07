@@ -101,13 +101,13 @@ void dial_user(tbl* teleRecord, tbl* billInfo,  int IDu)
 	int teletype=0;
 	int telefee=0;
 	char telenum[STRLENLIMIT];
-	
+	int inte[7];
 	int counter_pass=0;
 	int over;
 	int totalTime=0;
 	if(billInfo->clm.phint[IDu][9] > 0)
 	{
-		printf("Please enter your startTime:");
+		printf("\nPlease enter your startTime:");
 		printf("Example:19/09/01 23:40:20\n");
 		scanf("%d",&startTime.yea);
 		scanf("%d",&startTime.mon);
@@ -152,7 +152,6 @@ void dial_user(tbl* teleRecord, tbl* billInfo,  int IDu)
 		}
 		else
 		{
-			printf("Begin to calc fee\n");
 			if(startTime.sec<endTime.sec)
 			{
 				over=1;
@@ -166,6 +165,8 @@ void dial_user(tbl* teleRecord, tbl* billInfo,  int IDu)
 
 			if(teletype==1)
 			{
+				inte[5] = totalTime;
+				inte[6] = 0;
 				if(billInfo->clm.phint[IDu][6] >= totalTime)
 				{
 					billInfo->clm.phint[IDu][6] = billInfo->clm.phint[IDu][6] - totalTime;
@@ -178,6 +179,8 @@ void dial_user(tbl* teleRecord, tbl* billInfo,  int IDu)
 			}
 			else if(teletype==2)
 			{
+				inte[5] = 0;
+				inte[6] = totalTime;
 				if(billInfo->clm.phint[IDu][7] >= totalTime)
 				{
 					billInfo->clm.phint[IDu][7] = billInfo->clm.phint[IDu][7] - totalTime;
@@ -188,24 +191,22 @@ void dial_user(tbl* teleRecord, tbl* billInfo,  int IDu)
 					billInfo->clm.phint[IDu][7] = 0;
 				}
 			}
-			printf("prepare to addrow\n");
 			billInfo->clm.phint[IDu][9] = billInfo->clm.phint[IDu][9] - telefee;
-			int inte[5];
+			
 			inte[0] = teleRecord->info.rowNum;
 			inte[1] = 1;
 			inte[2] = teletype;
 			inte[3] = telefee;
 			inte[4] = IDu;
+			
 			char **nam;
 			nam=constructD2_char(1,STRLENLIMIT,'\0');
-			printf("%p",nam);
 			strcpy(nam[0],telenum);
 			tim time[2];
 			time[0]=startTime;
-			time[1]=endTime;
-			printf("Begin add row\n");	
-		//	addrow(teleRecord,inte,nam,time);
-			printf("%d",teleRecord->clm.phint[3][0]);
+			time[1]=endTime;	
+			cpyrow(teleRecord,inte,nam,time);
+			display_tbl(*teleRecord);
 		
 		}
 	}
@@ -251,13 +252,13 @@ void net_user(tbl* netRecord, tbl* billInfo, int IDu)
 			inte[1] = 1;
 			inte[2] = netfee;
 			inte[3] = IDu;
-			printf("init NULL name pointer\n");
+
 			char **nam=NULL;
 			tim time[1];
 			time[0]=Time;
-			printf("begin to add row\n");
-		//	addrow(netRecord,inte,nam,time);
-			printf("add row succ");
+		
+			cpyrow(netRecord,inte,nam,time);
+		
 	}
 	
 	else
@@ -270,22 +271,24 @@ void net_user(tbl* netRecord, tbl* billInfo, int IDu)
 
 void changePersonInfo(tbl* User,int IDu)
 {
+
 	printf("Which one do you want to change: 1.Telephone Number    2.User Password    3.User Email    4.Quit\n");
 	int type;
 	scanf("%d",&type);
 	switch(type)
 	{
-			case 1:
+	case 1:
 	{
 		printf("Enter your new number: ");
-		scanf("%d",&User->clm.phnam[IDu][2]);
+		
+		scanf("%s",&User->clm.phnam[IDu][2]);
 		printf("Your telephone number is setted.\n");
 		break;
 	}
 	case 2:
 	{
 		printf("Enter your new password: ");
-		scanf("%d",&User->clm.phnam[IDu][3]);
+		scanf("%s",&User->clm.phnam[IDu][3]);
 		printf("Your password is setted.\n");
 		break;
 	}
@@ -320,24 +323,29 @@ void checkTeleRecord(tbl *teleRecord, int IDu)
 	{
 		if(teleRecord->clm.phint[row_locater][4]==IDu)
 		{
-			printf("IDt:%d\n",teleRecord->clm.phint[row_locater][0]);
+			printf("\nIDt:%d\n",teleRecord->clm.phint[row_locater][0]);
 			printf("validt:%d\n",teleRecord->clm.phint[row_locater][1]);
 			printf("type:%d\n",teleRecord->clm.phint[row_locater][2]);
 			printf("teleFee:%d\n",teleRecord->clm.phint[row_locater][3]);
 			printf("user:%d\n",teleRecord->clm.phint[row_locater][4]);
 			printf("to:%s\n",teleRecord->clm.phnam[row_locater][0]);
-			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("starttime:");
+			display_tim(teleRecord->clm.phtim[row_locater][0]);
+			printf("\nendtime:");
+			display_tim(teleRecord->clm.phtim[row_locater][1]);
+			//printf("startTime:%02d/",teleRecord->clm.phtim[row_locater][0].yea);
+		
+		/*	printf("%02d/",teleRecord->clm.phtim[row_locater][0].mon);
+			printf("%02d ",teleRecord->clm.phtim[row_locater][0].day);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0].hou);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("%02d",teleRecord->clm.phtim[row_locater][0]);*/
 		}
 		row_locater++;
 	}
@@ -345,24 +353,31 @@ void checkTeleRecord(tbl *teleRecord, int IDu)
 
 void checkTeleRecordByTime(tbl* teleRecord, int IDu)
 {
+	char c[80];
 	tim temp_time;
-	printf("\nPlease enter your time like this 19/09/01 21:50:10\n");
+	printf("\nPlease enter your time like this 19/09/01\n");
 	printf("time:");
-	scanf("%2d/%2d/%2d %2d:%2d:%2d",&temp_time.yea,&temp_time.mon,&temp_time.day,&temp_time.hou,&temp_time.min,&temp_time.sec);
-	getchar();
+	scanf("%2d%2d%2d",&temp_time.yea,&temp_time.mon,&temp_time.day);
+	gets(c);
 	int row_locater=0;
 	int counter_pass=0;
-	while(row_locater<teleRecord->info.rowNum)
+display_tblrow(*teleRecord,IDu);
+	while(row_locater<=teleRecord->info.rowNum)
 	{
-		if(cmp_tim(temp_time,teleRecord->clm.phtim[row_locater][0])==1&&teleRecord->clm.phint[row_locater][4]==IDu)
+		
+		if(cmpday_tim(temp_time,teleRecord->clm.phtim[row_locater][0])==0&&teleRecord->clm.phint[row_locater][4]==IDu)
 		{
-			printf("IDt:%d\n",teleRecord->clm.phint[row_locater][0]);
+			printf("\nIDt:%d\n",teleRecord->clm.phint[row_locater][0]);
 			printf("validt:%d\n",teleRecord->clm.phint[row_locater][1]);
 			printf("type:%d\n",teleRecord->clm.phint[row_locater][2]);
 			printf("teleFee:%d\n",teleRecord->clm.phint[row_locater][3]);
 			printf("user:%d\n",teleRecord->clm.phint[row_locater][4]);
 			printf("to:%s\n",teleRecord->clm.phnam[row_locater][0]);
-			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
+			printf("starttime:");
+			display_tim(teleRecord->clm.phtim[row_locater][0]);
+			printf("\nendtime:");
+			display_tim(teleRecord->clm.phtim[row_locater][1]);
+			/*printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
 			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
 			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
 			printf("startTime:%02d",teleRecord->clm.phtim[row_locater][0]);
@@ -373,7 +388,7 @@ void checkTeleRecordByTime(tbl* teleRecord, int IDu)
 			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
 			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
 			printf("endTime:%02d",teleRecord->clm.phtim[row_locater][0]);
-			printf("endTime:%02d\n",teleRecord->clm.phtim[row_locater][0]);
+			printf("endTime:%02d\n",teleRecord->clm.phtim[row_locater][0]);*/
 			counter_pass++;
 		}
 		row_locater++;
@@ -382,6 +397,7 @@ void checkTeleRecordByTime(tbl* teleRecord, int IDu)
 	{
 		printf("Sorry,there's no matching record.\n");
 	}
+	getchar();
 }
 
 void checkNetRecord(tbl* netRecord, int IDu)
@@ -398,9 +414,11 @@ void checkNetRecord(tbl* netRecord, int IDu)
 			printf("comAmount:%d\n",netRecord->clm.phint[row_locater][2]);
 			printf("netFee:%d\n",netRecord->clm.phint[row_locater][3]);
 			printf("user:%d\n",netRecord->clm.phint[row_locater][4]);
-			printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
-			printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
-			printf("time:%02d\n",netRecord->clm.phtim[row_locater][0]);
+			printf("time:");
+			display_tim(netRecord->clm.phtim[row_locater][0]);
+			//printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
+			//printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
+			//printf("time:%02d\n",netRecord->clm.phtim[row_locater][0]);
 		}
 		row_locater++;
 	}	
@@ -424,9 +442,11 @@ void checkNetRecordByTime(tbl* netRecord, int IDu)
 			printf("comAmount:%d\n",netRecord->clm.phint[row_locater][2]);
 			printf("netFee:%d\n",netRecord->clm.phint[row_locater][3]);
 			printf("user:%d\n",netRecord->clm.phint[row_locater][4]);
-			printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
-			printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
-			printf("time:%02d\n",netRecord->clm.phtim[row_locater][0]);
+			printf("time:");
+			display_tim(netRecord->clm.phtim[row_locater][0]);
+		//	printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
+		//	printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
+		//	printf("time:%02d\n",netRecord->clm.phtim[row_locater][0]);
 			counter_pass++;
 		}
 		row_locater++;
@@ -453,9 +473,8 @@ void stat(tbl* User, tbl* moneyRecord, int IDa)
 			{
 				if(User->clm.phint[row_locater][0] == moneyRecord->clm.phint[rowMoney_locater][2])
 				{
-					printf("\nTime:%02d",moneyRecord->clm.phtim[rowMoney_locater][0]);
-					printf("Time:%02d",moneyRecord->clm.phtim[rowMoney_locater][0]);
-					printf("Time:%02d\n",moneyRecord->clm.phtim[rowMoney_locater][0]);
+					printf("\ntime:");
+					display_tim(moneyRecord->clm.phtim[rowMoney_locater][0]);
 				}
 				rowMoney_locater++;
 			}
@@ -480,10 +499,13 @@ void checkSet(tbl* sets,int provider)
 		{
 			printf("\nprice:%d\n",sets->clm.phint[provider][3]);
 			printf("netAmount:%d\n",sets->clm.phint[provider][4]);
- 			printf("borTime:%d\n",sets->clm.phtim[provider][0]);
- 			printf("forTime:%d\n",sets->clm.phtim[provider][1]);
+ 			printf("bortime:");
+			display_tim(sets->clm.phtim[provider][0]);
+			printf("\n");
+ 			printf("fortime:");
+			display_tim(sets->clm.phtim[provider][1]);
+			printf("\n");
  			printf("setname:%s\n",sets->clm.phnam[provider][0]);
- 			printf("description:%s\n",sets->clm.phnam[provider][1]);
  			counter_pass++;
 		}
 		row_locater++;
@@ -1163,14 +1185,14 @@ void BuySet(tbl setTbl,tbl* user,tbl* moneyRecord,tbl* billinfo,int IDu)
 			printf("Sorry, you still have a vaild set so you cannot order a new one.\n");
 			printf("press enter to continue\n");
 			getchar();
-			system("cls");
+			clearscree();
 		}
 	else if(billinfo->clm.phint[IDu][1]==0&&setTbl.clm.phint[choice][1]==0)
 	{
 		printf("This set is not available.\n");
 		printf("press enter to continue\n");
 		getchar();
-		system("cls");
+		clearscree();
 	}
 	else
 	{
@@ -1215,7 +1237,7 @@ void BuySet(tbl setTbl,tbl* user,tbl* moneyRecord,tbl* billinfo,int IDu)
 			}
 			printf("press enter to continue\n");
 			getchar();
-			system("cls");
+			clearscree();
 		}
 
 	}
@@ -1227,7 +1249,7 @@ void CheckAndBuy(tbl setTbl,tbl* user,tbl* moneyRecord,tbl* billinfo,tbl provide
 	int pass=0;
 	while(pass==0)
 	{
-		system("cls");
+		clearscree();
 		choice=-1;
 		printf("****************************************************************************************************\n");
 		printf("welcome,please choose a service\n");
@@ -1434,7 +1456,7 @@ int userMainBody(tbl provider,tbl user,tbl billinfo,tbl telerecord,tbl netrecord
 		case 3: 
 			return 1;
 	    } 
-	    system("cls");
+	    clearscree();
     }
 }
 
@@ -1491,5 +1513,5 @@ int userMainBody(tbl provider,tbl user,tbl billinfo,tbl telerecord,tbl netrecord
 	 ///   		return 1;
 	    	
 //	    } 
-//	    system("cls");
+//	    clearscree();
 //}

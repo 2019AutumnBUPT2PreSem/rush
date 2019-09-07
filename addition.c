@@ -1,3 +1,6 @@
+#ifndef ADDITION_C
+#define ADDITION_C
+
 void star()
 {
 	printf("*********************************************************************************************************************");
@@ -10,7 +13,7 @@ int userchoose(tbl* telerecord, tbl* billinfo,tbl* netrecord, tbl* user,  int ID
 	
 	while(choose!=8)
 	{
-        system("cls");
+        clearscree();
 		choose=0;
 		star();
 		printf("\nPlease choose a function:\n");
@@ -96,7 +99,7 @@ int userchoose(tbl* telerecord, tbl* billinfo,tbl* netrecord, tbl* user,  int ID
 int admchoose(tbl* telerecord, tbl* netrecord,  tbl* moneyrecord,tbl* sets,tbl* user,int provider, int IDa)
 {
 	int choose=0;
-    system("cls");
+    clearscree();
 	while(choose!=8)
 	{
 		star();
@@ -183,3 +186,4 @@ int admchoose(tbl* telerecord, tbl* netrecord,  tbl* moneyrecord,tbl* sets,tbl* 
 	}
 	
 }
+#endif

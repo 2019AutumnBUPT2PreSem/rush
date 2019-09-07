@@ -162,6 +162,7 @@
 int cmp_int(int a, int b);
 int cmp_nam(char *a, char *b);
 int cmp_tim(tim a, tim b);
+int cmpday_tim(tim a, tim b);
 //int cmp_float(float a, float b);
 /*______________________________________________________________________________________________*/
 int CompFun4Int(int comp,int comped)
@@ -228,6 +229,43 @@ int cmp_tim(tim a,tim b)
 				{
 					return -1;
 				}
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	else
+	{
+		return -1;
+	}
+}
+int cmpday_tim(tim a,tim b)
+{
+	if(a.yea>b.yea)
+	{
+		return 1;
+	}
+	else if(a.yea==b.yea)
+	{
+		if(a.mon>b.mon)
+		{
+			return 1;
+		}
+		else if(a.mon==b.mon)
+		{
+			if(a.day>b.day)
+			{
+				return 1;
+			}
+			else if(a.day==b.day)
+			{
+				return 0;
 			}
 			else
 			{
