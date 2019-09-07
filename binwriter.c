@@ -41,11 +41,11 @@ int main()
             scanf("%s", clm.phnam[i][j]);
         }
     }
-    FILE* pfile = fopen("billinfo.idat", "wb");
+    FILE* pfile = fopen("netecord.idat", "wb");
     writeidat(pfile, info, &clm, 30);
     fclose(pfile);
     
-    pfile = fopen("billinfo.cdat", "wb");
+    pfile = fopen("netrecord.cdat", "wb");
     writecdat(pfile, info, &clm, 30);
     fclose(pfile);
     return 0;

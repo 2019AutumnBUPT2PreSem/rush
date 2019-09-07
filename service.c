@@ -312,6 +312,7 @@ void changePersonInfo(tbl* User,int IDu)
 
 void checkTeleRecord(tbl *teleRecord, int IDu)
 {
+	getchar();
 	int row=teleRecord->info.rowNum;
 	int row_locater=0;
 	int counter_pass=0;
