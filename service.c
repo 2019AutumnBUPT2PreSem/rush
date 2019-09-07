@@ -220,6 +220,7 @@ void dial_user(tbl* teleRecord, tbl* billInfo,  int IDu)
 
 void net_user(tbl* netRecord, tbl* billInfo, int IDu)
 {
+	char c[80];
 	tim Time;
 	int comAmount=0;
 	int netfee=0;
@@ -231,12 +232,14 @@ void net_user(tbl* netRecord, tbl* billInfo, int IDu)
 		scanf("%d",&Time.yea);
 		scanf("%d",&Time.mon);
 		scanf("%d",&Time.day);
-		getchar();
+		Time.hou=0;
+		Time.min=0;
+		Time.sec=0;
+		gets(c);
 	
 		printf("The data use:");
 		scanf("%d",&comAmount);
 		getchar();
-		printf("	Begin to Judge set's data remain\n");
 			if(billInfo->clm.phint[IDu][8] >= comAmount)
 				{
 					billInfo->clm.phint[IDu][8] = billInfo->clm.phint[IDu][8] - comAmount;
@@ -257,9 +260,8 @@ void net_user(tbl* netRecord, tbl* billInfo, int IDu)
 			char **nam=NULL;
 			tim time[1];
 			time[0]=Time;
-		printf("begin copyrow\n");
 			cpyrow(netRecord,inte,nam,time);
-			display_tbl(*netRecord);
+			
 		
 		
 	}
@@ -274,8 +276,10 @@ void net_user(tbl* netRecord, tbl* billInfo, int IDu)
 
 void changePersonInfo(tbl* User,int IDu)
 {
-
-	printf("Which one do you want to change: 1.Telephone Number    2.User Password    3.User Email    4.Quit\n");
+	//char **nam;
+//	nam=constructD2_char(1,STRLENLIMIT,'\0');
+	char c[80];
+	printf("\nWhich one do you want to change: 1.Telephone Number    2.User Password    3.User Email    4.Quit\n");
 	int type;
 	scanf("%d",&type);
 	switch(type)
@@ -283,23 +287,25 @@ void changePersonInfo(tbl* User,int IDu)
 	case 1:
 	{
 		printf("Enter your new number: ");
-		
-		scanf("%s",&User->clm.phnam[IDu][2]);
-		printf("Your telephone number is setted.\n");
+
+		scanf("%s",User->clm.phnam[IDu][2]);
+		printf("Your telephone number is setted.\n\n\n\n\n");
 		break;
 	}
 	case 2:
 	{
 		printf("Enter your new password: ");
-		scanf("%s",&User->clm.phnam[IDu][3]);
-		printf("Your password is setted.\n");
+			
+			//strcpy(nam[0],telenum);
+		scanf("%s",User->clm.phnam[IDu][3]);
+		printf("Your password is setted.\n\n\n\n\n");
 		break;
 	}
 	case 3:
 	{
 		printf("Enter your new email: ");
 		enterEmail(User,IDu);
-		printf("Your email is setted.\n");
+		printf("Your email is setted.\n\n\n\n\n");
 		break;
 	}
 	case 4:
@@ -312,6 +318,7 @@ void changePersonInfo(tbl* User,int IDu)
 		changePersonInfo(User, IDu);
 	}
 	}
+	
 	
 
 }
@@ -353,7 +360,7 @@ void checkTeleRecordByTime(tbl* teleRecord, int IDu)
 	int row_locater=0;
 	int counter_pass=0;
 	display_tblrow(*teleRecord,IDu);
-	while(row_locater<teleRecord->info.rowNum)
+	while(row_locater<=teleRecord->info.rowNum)
 	{
 		
 		if(cmpday_tim(temp_time,teleRecord->clm.phtim[row_locater][0])==0&&teleRecord->clm.phint[row_locater][4]==IDu)
@@ -412,9 +419,9 @@ void checkNetRecordByTime(tbl* netRecord, int IDu)
 	gets(c);
 	int row_locater=0;
 	int counter_pass=0;
-	while(row_locater<netRecord->info.rowNum)
+	while(row_locater<=netRecord->info.rowNum)
 	{
-		if(cmp_tim(temp_time,netRecord->clm.phtim[row_locater][0])==0&&netRecord->clm.phint[row_locater][4]==IDu)
+		if(cmpday_tim(temp_time,netRecord->clm.phtim[row_locater][0])==0&&netRecord->clm.phint[row_locater][4]==IDu)
 		{
 			printf("\nIDn:%d\n",netRecord->clm.phint[row_locater][0]);//buzhidaogeduoshaoge
 			printf("validn:%d\n",netRecord->clm.phint[row_locater][1]);
@@ -423,9 +430,7 @@ void checkNetRecordByTime(tbl* netRecord, int IDu)
 			printf("user:%d\n",netRecord->clm.phint[row_locater][4]);
 			printf("time:");
 			display_tim(netRecord->clm.phtim[row_locater][0]);
-		//	printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
-		//	printf("time:%02d",netRecord->clm.phtim[row_locater][0]);
-		//	printf("time:%02d\n",netRecord->clm.phtim[row_locater][0]);
+		
 			counter_pass++;
 		}
 		row_locater++;
@@ -521,7 +526,7 @@ void addNewSet(tbl* sets,int provider)
 		case 1:
 	{
 		printf("\nEnter new password: ");
-		scanf("%d",&User->clm.phnam[IDa][3]);
+		scanf("%s",&User->clm.phnam[IDa][3]);
 		printf("Password is setted.\n");
 		break;
 	}
