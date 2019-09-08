@@ -1,8 +1,8 @@
 # source files
 ```
-multitype -> arraysupport -|
-           displaysupport -|->dboperation |-> dbio -----------------|
-              utilsupport -|              L-> service -> interface -L-> procedure
+multitype -> arraysupport -|               |-> interface -|
+           displaysupport -|->dboperation -|-> backstage -|-> procedure
+              utilsupport -|              
 ```
 # functions in those source files
 ## multitype

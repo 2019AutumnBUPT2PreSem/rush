@@ -9,6 +9,7 @@
 #include"service.c"
 #include"FileReader.c"
 #include"addition.c"
+#include"procedure.c"
 
 void clearscree(void)
 {
@@ -20,89 +21,8 @@ int main()
 {
 	/*get all table*/
 	tbl provider,user,billinfo,telerecord,netrecord,admin,sets,moneyrecord;
-	FILE *pfile;
+	loadTable(&provider,&user,&billinfo,&telerecord,&netrecord,&admin,&sets,&moneyrecord);
 
-	provider.lrn = 30;
-	pfile=fopen("provider.idat","rb");
-	provider.info = readidat(pfile, &provider.clm, provider.lrn);
-	fclose(pfile);
-
-	pfile=fopen("provider.cdat","rb");
-	readcdat(pfile, provider.info, &provider.clm, provider.lrn);
-	fclose(pfile);
-
-	///////////////////
-	admin.lrn =30;
-	pfile=fopen("admin.idat","rb");
-	admin.info = readidat(pfile, &admin.clm,admin.lrn);
-	fclose(pfile);
-
-	pfile=fopen("admin.cdat","rb");
-	readcdat(pfile,admin.info, &admin.clm,admin.lrn);
-	fclose(pfile);
-
-	///////////////////
-	telerecord.lrn = 30;
-	pfile=fopen("telerecord.idat","rb");
-	telerecord.info = readidat(pfile,&telerecord.clm,telerecord.lrn);
-	fclose(pfile);	
-
-	pfile=fopen("telerecord.cdat","rb");
-	readcdat(pfile,telerecord.info,&telerecord.clm,telerecord.lrn);
-	fclose(pfile);
-
-	////////////////////
-	netrecord.lrn = 30;
-	pfile=fopen("netrecord.idat","rb");
-	netrecord.info= readidat(pfile,&netrecord.clm,netrecord.lrn);
-	fclose(pfile);
-
-	pfile=fopen("netrecord.cdat","rb");
-	readcdat(pfile,netrecord.info,&netrecord.clm,netrecord.lrn);
-	fclose(pfile);
-
-	////////////////////
-	sets.lrn = 30;
-	pfile=fopen("sets.idat","rb");
-	sets.info= readidat(pfile,&sets.clm,sets.lrn);
-	fclose(pfile);
-
-	pfile=fopen("sets.cdat","rb");
-	readcdat(pfile,sets.info,&sets.clm,sets.lrn);
-	fclose(pfile);
-
-	////////////////////
-	user.lrn = 30;
-	pfile=fopen("user.idat","rb");
-	user.info = readidat(pfile,&user.clm,user.lrn);
-	fclose(pfile);
-
-	pfile=fopen("user.cdat","rb");
-	readcdat(pfile,user.info,&user.clm,user.lrn);
-	fclose(pfile);
-
-	////////////////////
-	moneyrecord.lrn = 30;
-	pfile=fopen("moneyrecord.idat","rb");
-	moneyrecord.info = readidat(pfile,&moneyrecord.clm,moneyrecord.lrn);
-	fclose(pfile);
-
-	pfile=fopen("moneyrecord.cdat","rb");
-	readcdat(pfile,moneyrecord.info,&moneyrecord.clm,moneyrecord.lrn);
-	fclose(pfile);
-
-	/////////////////////
-	billinfo.lrn = 30;
-	pfile=fopen("billinfo.idat","rb");
-	billinfo.info=readidat(pfile,&billinfo.clm,billinfo.lrn);
-	fclose(pfile);
-
-	pfile=fopen("billinfo.cdat","rb");
-	readcdat(pfile,billinfo.info,&billinfo.clm,billinfo.lrn);
-	fclose(pfile);
-	
-	//clearscree();
-	/*we gonna read all table there*/
 	int quit_prog=0;
 	int quit_menu=0;
 	int IDu=-1;
@@ -115,6 +35,129 @@ int main()
 	
 //	char **idpw = constructD2_char(2, STRLENLIMIT, '\0');
 //	idpw[1]={}
+
+	int status, statusu, statusa;
+	while(quit_prog == 0)
+	{
+		procedure_login(&status);
+		switch (status)// 0 for exit, 1 for admin, 2 for user, default for error
+		{
+		case 0:// quit
+		{
+			procedure_quit_login();
+			quit_prog = 1;
+			break;
+		}
+		case 1:// login as admin
+		{
+			procedure_login_admin(admin, &IDa, &quit_menu);
+			while (quit_menu == 0)
+			{
+				procedure_admin_menu(admin, IDa, &statusa);
+				switch(statusa)
+				{
+					case 1:
+					{
+						procedure_stat();
+						break;
+					}
+					case 2:
+					{
+						procedure_stattele();	
+						break;
+					}
+					case 3:
+					{
+						procedure_sortCallingByTimeSgmt();
+						break;
+					}
+					case 4:
+					{
+						procedure_sortFee();
+					}
+					default:
+					{
+						procedure_error_admin(statusa)
+					}
+
+				}
+			}
+			IDa = -1;
+			break;
+		}	
+		case 2:// login as user
+		{
+			procedure_login_user(user, &IDu, &quit_menu);
+			while (quit_menu == 0)
+			{
+				procedure_user_menu(user, IDu, &statusu);
+				switch (statusu)
+				{
+				case 1:
+				{
+					procedure_dial_user(&telerecord, &billinfo, IDu);
+					break;
+				}
+				case 2:
+				{
+					procedure_net_user(&netrecord, &billinfo, IDu);
+					break;
+				}
+				case 3:
+				{
+					procedure_changePersonInfo(&user, IDu);
+					break;
+				}
+				case 4:
+				{
+					procedure_checkTeleRecord(telerecord, IDu);
+					break;
+				}
+				case 5:
+				{
+					procedure_checkTeleRecordByTime(telerecord, IDu);
+					break;
+				}
+				case 6:
+				{
+					procedure_checkNetRecord(netrecord, IDu);
+					break;
+				}
+				case 7:
+				{
+					procedure_checkNetRecordByTime(netrecord, IDu);
+					break;
+				}
+				case 8:
+				{
+					procedure_quit_user(user, IDu);
+					quit_menu = 1;
+					break;
+				}
+				default:
+				{
+					procedure_error_user(statusu);
+					break;
+				}
+				}
+			}
+			IDu = -1;
+			break;
+		}	
+		default:
+		{
+			procedure_login_type_error(status);
+			break;
+		}	
+		}
+	}
+	saveTable(provider,user,billinfo,telerecord,netrecord,admin,sets,moneyrecord);
+
+	return 0;
+
+
+
+/*
 	while(quit_prog==0)
 	{
 		quit_menu=0;
@@ -177,73 +220,8 @@ int main()
 			getchar();
 		}
 	}
+	*/
 	/*write table*/
 	//writeAllTable(&provider, &user, &billinfo, &telerecord, &netrecord, &admin, &sets, &moneyrecord);
-	provider.lrn =30;
-	pfile=fopen("provider.idat","wb");
-	writeidat(pfile,provider.info, &provider.clm,provider.lrn);
-	fclose(pfile);
-
-	pfile=fopen("provider.cdat","wb");
-	writecdat(pfile,provider.info,&provider.clm,provider.lrn);
-	fclose(pfile);
-	admin.lrn = 30;
-	pfile=fopen("admin.idat","wb");
-	writeidat(pfile,admin.info, &admin.clm,admin.lrn);
-	fclose(pfile);
-
-	pfile=fopen("admin.cdat","wb");
-	writecdat(pfile,admin.info,&admin.clm,admin.lrn);
-	fclose(pfile);
-
-	telerecord.lrn = 30;
-	pfile=fopen("telerecord.idat","wb");
-	writeidat(pfile,telerecord.info,	&telerecord.clm,telerecord.lrn);
-	fclose(pfile);	
-
-	pfile=fopen("telerecord.cdat","wb");
-	writecdat(pfile,telerecord.info,&telerecord.clm,telerecord.lrn);
-	fclose(pfile);
-netrecord.lrn = 30;
-	pfile=fopen("netrecord.idat","wb");
-	 writeidat(pfile,netrecord.info,&netrecord.clm,netrecord.lrn);
-	fclose(pfile);
-
-	pfile=fopen("netrecord.cdat","wb");
-	writecdat(pfile,netrecord.info,&netrecord.clm,netrecord.lrn);
-	fclose(pfile);
-sets.lrn = 30;
-	pfile=fopen("sets.idat","wb");
-	writeidat(pfile,sets.info,&sets.clm,sets.lrn);
-	fclose(pfile);
-
-	pfile=fopen("sets.cdat","wb");
-	writecdat(pfile,sets.info,&sets.clm,sets.lrn);
-	fclose(pfile);
-user.lrn = 30;
-	pfile=fopen("user.idat","wb");
-	writeidat(pfile,user.info,&user.clm,user.lrn);
-	fclose(pfile);
-
-	pfile=fopen("user.cdat","wb");
-	writecdat(pfile,user.info,&user.clm,user.lrn);
-	fclose(pfile);
-moneyrecord.lrn = 30;
-	pfile=fopen("moneyrecord.idat","wb");
-	writeidat(pfile,moneyrecord.info,&moneyrecord.clm,moneyrecord.lrn);
-	fclose(pfile);
-
-	pfile=fopen("moneyrecord.cdat","wb");
-	writecdat(pfile,moneyrecord.info,&moneyrecord.clm,moneyrecord.lrn);
-	fclose(pfile);
-billinfo.lrn = 30;
-	pfile=fopen("billinfo.idat","wb");
-	writeidat(pfile,billinfo.info,&billinfo.clm,billinfo.lrn);
-	fclose(pfile);
-
-	pfile=fopen("billinfo.cdat","wb");
-	writecdat(pfile,billinfo.info,&billinfo.clm,billinfo.lrn);
-	fclose(pfile);
-
-	return 0;
+	
 }

@@ -55,6 +55,12 @@ void sortCallingByTimeSgmt(tbl* teleRecord,int type);
 void sortFee(tbl* User, tbl* teleRecord, tbl* netRecord, int IDa);
 void enterEmail(tbl* user,int IDu);
 
+/////////////////////////////////////////////////////
+
+
+
+
+///////////////////////////////////////////
 
 void ChargeFun(tbl* billInfo,int IDu)
 {
@@ -1352,7 +1358,7 @@ int InputIDPW_iter(char *ID, char *PW, int type)
 		  if(id[i]>='a'&&id[i]<='z')
 		   count2++;
 	}
-	 if(count1==0||count2==0||count1+count2<6||count1+count2>10)
+	if(count1==0||count2==0||count1+count2<6||count1+count2>10)
 	{
 		  printf("Error.");
 		  return 1;
