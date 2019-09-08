@@ -229,7 +229,7 @@ void cpyrow(tbl *ptable, int *introw, char **namrow, tim *timrow)
     ptable->info.rowNum = ptable->info.rowNum + 1;
 }
 
-display_tblrow(tbl table, int ID)
+show_tblrow(tbl table, int ID)
 {
 	int i = ID;
 	int **ppint = table.clm.phint;
@@ -253,7 +253,7 @@ display_tblrow(tbl table, int ID)
         printf("\n");    
 }
 
-void display_tbl(tbl table)
+void show_tbl(tbl table)
 {
     int **ppint = table.clm.phint;
     char ***ppnam = table.clm.phnam;
